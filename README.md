@@ -16,5 +16,6 @@ Which NBA positions age better, and are these differences related to how key ski
 - 5 positions: PG, SG, SF, PF, C
 - Filter: 1000+ minutes per season
 
-## AI Tool Usage
-Claude was used for data collection code, debugging, and EDA guidance.
+## Notes
+This project was completed as part of DSA210 coursework. 
+AI assistance (Claude) was used in accordance with course guidelines for coding support and debugging.
