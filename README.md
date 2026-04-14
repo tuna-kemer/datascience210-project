@@ -2,16 +2,20 @@
 
 **DSA 210 — Introduction to Data Science | Spring 2025-2026**
 
-## Research Question
+---
+
+## 1. Research Question
 Which NBA positions age better, and are these differences related to how key skills (athleticism, shooting, playmaking) decline over time?
 
 ---
 
-## Data Sources
+## 2. Data Sources & Dataset
+
+### 2.1 Data Sources
 - **nba_api:** Season-level per-game stats for 2010-2024 (14 seasons, 7190 raw observations)
 - **Kaggle (Damir Dizdarevic):** Position labels and advanced stats (PER, BPM, VORP, WS)
 
-## Dataset
+### 2.2 Dataset Characteristics
 - 3570 player-season observations after merging
 - 5 positions: PG, SG, SF, PF, C
 - Filter: 1000+ minutes per season
@@ -19,7 +23,9 @@ Which NBA positions age better, and are these differences related to how key ski
 
 ---
 
-## Exploratory Data Analysis
+## 3. Exploratory Data Analysis
+
+### 3.1 Visualizations
 
 | Visualization | Description |
 |---|---|
@@ -32,41 +38,68 @@ Which NBA positions age better, and are these differences related to how key ski
 
 ---
 
-## Hypothesis Tests
+## 4. Hypothesis Testing
 
-### Test 1: C vs PG BPM (t-test)
-- **H₀:** No difference in BPM between Centers and Guards
-- **Result:** p=0.234 → No significant difference
-- Centers BPM: 0.726, Guards BPM: 0.548
+To validate the findings from exploratory data analysis, formal statistical tests were conducted.
 
-### Test 2: Age vs TS% (Pearson Correlation)
-- **H₀:** No correlation between age and True Shooting %
-- **Result:** r=0.086, p<0.001 → Significant positive correlation
-- PGs show strongest improvement with age (r=0.251)
-- Centers show no significant change (r=-0.049)
+### 4.1 Do Centers Age Better Than Guards in Terms of BPM? (t-test)
 
-### Test 3: BPM Before/After Age 28 (ANOVA)
-- **H₀:** No difference in BPM across positions
-- **Result:** F=30.423, p<0.001 → Significant difference
-- All positions improve BPM after age 28 (SF: +0.55, PG: +0.42)
+- **Null Hypothesis (H₀):** There is no difference in BPM between Centers and Point Guards.
+- **Alternative Hypothesis (H₁):** Centers maintain higher BPM than Guards with age.
+- **Test Used:** Independent samples t-test
+- **Result:** T-statistic=1.191, p=0.234
 
-### Test 4: Athleticism Decline (Pearson Correlation)
-- **H₀:** No relationship between age and athleticism
-- **Result:** PG steals decline (r=-0.104, p<0.01), PF blocks decline most (r=-0.212, p<0.001)
-- Centers maintain blocking ability with age (not significant)
+**Conclusion:**
+The null hypothesis cannot be rejected. There is no statistically significant difference in BPM between Centers (mean=0.726) and Guards (mean=0.548).
 
 ---
 
-## Key Findings
+### 4.2 Does True Shooting % Change With Age? (Pearson Correlation)
+
+- **Null Hypothesis (H₀):** There is no correlation between age and True Shooting %.
+- **Alternative Hypothesis (H₁):** True Shooting % changes significantly with age.
+- **Test Used:** Pearson Correlation
+- **Result:** r=0.086, p<0.001
+
+**Conclusion:**
+The null hypothesis is rejected. There is a statistically significant positive correlation between age and TS%. PGs show the strongest improvement (r=0.251), while Centers show no significant change (r=-0.049, p=0.225).
+
+---
+
+### 4.3 Do Positions Differ in Performance After Age 28? (ANOVA)
+
+- **Null Hypothesis (H₀):** There is no difference in BPM across positions for players over 28.
+- **Alternative Hypothesis (H₁):** Some positions maintain performance better after age 28.
+- **Test Used:** One-way ANOVA
+- **Result:** F=30.423, p<0.001
+
+**Conclusion:**
+The null hypothesis is rejected. BPM differs significantly across positions. All positions improve after age 28, with SF showing the largest gain (+0.55) and PF the smallest (+0.30).
+
+---
+
+### 4.4 Does Athleticism Decline With Age? (Pearson Correlation)
+
+- **Null Hypothesis (H₀):** There is no relationship between age and athleticism metrics.
+- **Alternative Hypothesis (H₁):** Athleticism declines significantly with age.
+- **Test Used:** Pearson Correlation (STL for guards, BLK for bigs)
+- **Result:** PG steals: r=-0.104 (p<0.01), PF blocks: r=-0.212 (p<0.001)
+
+**Conclusion:**
+The null hypothesis is rejected for PG and PF. PF athleticism declines most sharply with age. Centers maintain their blocking ability (r=-0.055, p=0.175).
+
+---
+
+## 5. Key Findings
 - Centers maintain the highest shooting efficiency (TS%) across all ages
 - PG shooting improves most significantly with age (r=0.251, p<0.001)
 - All positions improve overall performance (BPM) after age 28
-- PF athleticism declines most sharply with age (r=-0.212)
+- PF athleticism declines most sharply with age (r=-0.212, p<0.001)
 - Significant BPM differences exist across positions (ANOVA p<0.001)
 
 ---
 
-## Project Structure
+## 6. Project Structure
 ```
 datascience210-project/
 ├── nba_analysis.ipynb     # Main notebook (data collection, EDA, hypothesis tests)
@@ -75,12 +108,8 @@ datascience210-project/
 └── README.md
 ```
 
-## How to Run
-1. Open `nba_analysis.ipynb` in Google Colab
-2. Run all cells in order
-3. Upload `archive.zip` (Kaggle dataset) when prompted at Cell 4
 
-## Dependencies
+## 7. Dependencies
 ```
 nba_api
 pandas
