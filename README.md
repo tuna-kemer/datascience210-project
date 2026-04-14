@@ -102,9 +102,15 @@ The null hypothesis is rejected for PG and PF. PF athleticism declines most shar
 ## 6. Project Structure
 ```
 datascience210-project/
-├── nba_analysis.ipynb     # Main notebook (data collection, EDA, hypothesis tests)
-├── nba_final.csv          # Processed dataset (3570 rows, 26 features)
-├── requirements.txt       # Python dependencies
+├── data/
+│   ├── nba_raw.csv          # Raw NBA stats from nba_api (3683 rows)
+│   ├── nba_kaggle.csv       # Kaggle advanced stats dataset
+│   └── nba_final.csv        # Merged final dataset (3570 rows, 26 features)
+├── figures/                 # EDA visualizations
+├── notebooks/
+│   └── nba_analysis.ipynb   # Main notebook (data collection, EDA, hypothesis tests)
+├── Project_Proposal_Document.pdf
+├── requirements.txt         # Python dependencies
 └── README.md
 ```
 
