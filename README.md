@@ -90,41 +90,72 @@ The null hypothesis is rejected for PG and PF. PF athleticism declines most shar
 
 ---
 
-## 5. Key Findings
+## 5. Machine Learning
+
+### 5.1 Feature Engineering
+Career slope features were computed for each player with 3+ seasons:
+- **BPM_SLOPE:** Overall performance trend per year of age
+- **STL_SLOPE, BLK_SLOPE:** Athleticism trends
+- **TS_SLOPE:** Shooting efficiency trend
+- **AST_SLOPE:** Playmaking trend
+
+### 5.2 Models
+
+**Ridge Regression**
+- Task: Predict BPM slope from skill trends and position
+- Result: R² = 0.524 (5-fold CV), R² = 0.630 (test)
+- Key finding: TS_SLOPE is the strongest predictor of good aging
+
+**K-Means Clustering (k=3)**
+- Task: Group players by aging profile
+- Result: 3 clusters — declining, stable, improving
+- Key finding: Cluster composition is similar across positions, suggesting skill profile matters more than position
+
+**Logistic Regression**
+- Task: Classify players as "good ager" vs "not good ager"
+- Result: Accuracy = 0.957 (5-fold CV), 0.941 (test)
+- Key finding: STL_SLOPE and AST_SLOPE are the strongest signals of good aging
+
+---
+
+## 6. Key Findings
 - Centers maintain the highest shooting efficiency (TS%) across all ages
 - PG shooting improves most significantly with age (r=0.251, p<0.001)
 - All positions improve overall performance (BPM) after age 28
 - PF athleticism declines most sharply with age (r=-0.212, p<0.001)
 - Significant BPM differences exist across positions (ANOVA p<0.001)
+- Skill profile (TS%, STL, AST trends) predicts aging better than position alone
 
 ---
 
-## 6. Project Structure
+## 7. Project Structure
+
 ```
 datascience210-project/
 ├── data/
 │   ├── nba_raw.csv          # Raw NBA stats from nba_api (3683 rows)
 │   ├── nba_kaggle.csv       # Kaggle advanced stats dataset
 │   └── nba_final.csv        # Merged final dataset (3570 rows, 26 features)
-├── figures/                 # EDA visualizations
+├── figures/
+│   ├── eda/                 # Exploratory data analysis visualizations
+│   └── ml/                  # Machine learning result visualizations
 ├── notebooks/
-│   └── nba_analysis.ipynb   # Main notebook (data collection, EDA, hypothesis tests)
+│   └── nba_analysis.ipynb   # Main notebook (data collection, EDA, hypothesis tests, ML)
 ├── Project_Proposal_Document.pdf
 ├── requirements.txt         # Python dependencies
 └── README.md
 ```
 
+## 8. Dependencies
 
-## 7. Dependencies
 ```
 nba_api
 pandas
 matplotlib
 seaborn
 scipy
+scikit-learn
 ```
-
----
 
 ## Notes
 This project was completed as part of DSA210 coursework at Sabancı University.
