@@ -38,12 +38,7 @@ Which NBA positions age better, and are these differences related to how key ski
 | TS% and BPM Trends (Smoothed) | Centers maintain highest TS% across all ages |
 | Skill Group Analysis | Athleticism declines, shooting improves, playmaking stable with age |
 
-![Age Distribution](figures/eda/age_distribution.png)
-![BPM by Age and Position](figures/eda/bpm_by_age_position.png)
-![Stats by Position](figures/eda/stats_by_position.png)
-![Correlation Heatmap](figures/eda/correlation_heatmap.png)
-![Trend Age Performance](figures/eda/trend_age_performance.png)
-![Skill Groups by Age](figures/eda/skill_groups_by_age.png)
+All EDA visualizations are available in `figures/eda/`.
 
 ---
 
@@ -127,11 +122,7 @@ Career slope features were computed for each player with 3+ seasons:
 
 ### 5.3 Visualizations
 
-![Ridge Feature Importance](figures/ml/ridge_feature_importance.png)
-![K-Means Clusters](figures/ml/kmeans_clusters.png)
-![K-Means Elbow](figures/ml/kmeans_elbow.png)
-![Confusion Matrix](figures/ml/confusion_matrix.png)
-![ML Summary](figures/ml/ml_summary.png)
+All ML visualizations are available in `figures/ml/`.
 
 ---
 
