@@ -153,6 +153,7 @@ datascience210-project/
 ├── Project_Proposal_Document.pdf
 ├── final_report.md
 ├── final_report.pdf
+├── index.html              # Interactive project website
 ├── requirements.txt
 └── README.md
 ```
