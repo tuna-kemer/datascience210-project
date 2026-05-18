@@ -51,10 +51,9 @@ To validate the findings from exploratory data analysis, formal statistical test
 - **Null Hypothesis (H₀):** There is no difference in BPM between Centers and Point Guards.
 - **Alternative Hypothesis (H₁):** Centers maintain higher BPM than Guards with age.
 - **Test Used:** Independent samples t-test
-- **Result:** T-statistic=1.191, p=0.234
+- **Result:** T-statistic=1.191, p=0.234, Cohen's d=0.066 (negligible effect)
 
-**Conclusion:**
-The null hypothesis cannot be rejected. There is no statistically significant difference in BPM between Centers (mean=0.726) and Guards (mean=0.548).
+**Conclusion:** The null hypothesis cannot be rejected. No statistically significant BPM difference between Centers (mean=0.726) and Guards (mean=0.548).
 
 ---
 
@@ -63,10 +62,9 @@ The null hypothesis cannot be rejected. There is no statistically significant di
 - **Null Hypothesis (H₀):** There is no correlation between age and True Shooting %.
 - **Alternative Hypothesis (H₁):** True Shooting % changes significantly with age.
 - **Test Used:** Pearson Correlation
-- **Result:** r=0.086, p<0.001
+- **Result:** r=0.086, p<0.001 (negligible overall; PG: r=0.251, small effect)
 
-**Conclusion:**
-The null hypothesis is rejected. There is a statistically significant positive correlation between age and TS%. PGs show the strongest improvement (r=0.251), while Centers show no significant change (r=-0.049, p=0.225).
+**Conclusion:** The null hypothesis is rejected. TS% increases with age. PGs show the strongest improvement (r=0.251), Centers show no significant change (r=-0.049, p=0.225).
 
 ---
 
@@ -75,10 +73,9 @@ The null hypothesis is rejected. There is a statistically significant positive c
 - **Null Hypothesis (H₀):** There is no difference in BPM across positions for players over 28.
 - **Alternative Hypothesis (H₁):** Some positions maintain performance better after age 28.
 - **Test Used:** One-way ANOVA
-- **Result:** F=30.423, p<0.001
+- **Result:** F=30.423, p<0.001, Eta²=0.031 (small effect)
 
-**Conclusion:**
-The null hypothesis is rejected. BPM differs significantly across positions. All positions improve after age 28, with SF showing the largest gain (+0.55) and PF the smallest (+0.30).
+**Conclusion:** The null hypothesis is rejected. BPM differs significantly across positions after age 28. SF shows the largest gain (+0.55), PF the smallest (+0.30).
 
 ---
 
@@ -87,17 +84,16 @@ The null hypothesis is rejected. BPM differs significantly across positions. All
 - **Null Hypothesis (H₀):** There is no relationship between age and athleticism metrics.
 - **Alternative Hypothesis (H₁):** Athleticism declines significantly with age.
 - **Test Used:** Pearson Correlation (STL for guards, BLK for bigs)
-- **Result:** PG steals: r=-0.104 (p<0.01), PF blocks: r=-0.212 (p<0.001)
+- **Result:** PG steals: r=-0.104 (p<0.01, small effect), PF blocks: r=-0.212 (p<0.001, small effect)
 
-**Conclusion:**
-The null hypothesis is rejected for PG and PF. PF athleticism declines most sharply with age. Centers maintain their blocking ability (r=-0.055, p=0.175).
+**Conclusion:** The null hypothesis is rejected for PG and PF. PF athleticism declines most sharply. Centers maintain blocking ability (r=-0.055, p=0.175, negligible).
 
 ---
 
 ## 5. Machine Learning
 
 ### 5.1 Feature Engineering
-Career slope features were computed for each player with 3+ seasons:
+Career slope features were computed for each player with 3+ seasons (510 players):
 - **BPM_SLOPE:** Overall performance trend per year of age
 - **STL_SLOPE, BLK_SLOPE:** Athleticism trends
 - **TS_SLOPE:** Shooting efficiency trend
@@ -107,20 +103,23 @@ Career slope features were computed for each player with 3+ seasons:
 
 **Ridge Regression**
 - Task: Predict BPM slope from skill trends and position
-- Result: R² = 0.524 (5-fold CV), R² = 0.630 (test)
+- Result: R²=0.524 (5-fold CV), R²=0.630 (test)
 - Key finding: TS_SLOPE is the strongest predictor of good aging
+
+**Model Comparison (Baseline vs Extended)**
+- Baseline (skill slopes only): R²=0.515
+- Extended (+ position + age): R²=0.524
+- Improvement: +0.009 → position adds negligible predictive value
 
 **K-Means Clustering (k=3)**
 - Task: Group players by aging profile
 - Result: 3 clusters — declining, stable, improving
-- Key finding: Cluster composition is similar across positions, suggesting skill profile matters more than position
+- Key finding: Cluster composition is similar across positions — skill profile matters more than position
 
 **Logistic Regression**
 - Task: Classify players as "good ager" vs "not good ager"
-- Result: Accuracy = 0.957 (5-fold CV), 0.941 (test)
+- Result: Accuracy=0.957 (5-fold CV), 0.941 (test)
 - Key finding: STL_SLOPE and AST_SLOPE are the strongest signals of good aging
-
-### 5.3 Visualizations
 
 All ML visualizations are available in `figures/ml/`.
 
@@ -132,7 +131,7 @@ All ML visualizations are available in `figures/ml/`.
 - All positions improve overall performance (BPM) after age 28
 - PF athleticism declines most sharply with age (r=-0.212, p<0.001)
 - Significant BPM differences exist across positions (ANOVA p<0.001)
-- Skill profile (TS%, STL, AST trends) predicts aging better than position alone
+- Adding position to ML model improves R² by only +0.009 — skill profile predicts aging better than position
 
 ---
 
@@ -145,13 +144,14 @@ datascience210-project/
 │   ├── nba_kaggle.csv       # Kaggle advanced stats dataset
 │   └── nba_final.csv        # Merged final dataset (3570 rows, 26 features)
 ├── figures/
-│   ├── eda/                 # Exploratory data analysis visualizations
-│   └── ml/                  # Machine learning result visualizations
+│   ├── eda/                 # EDA visualizations (6 figures)
+│   └── ml/                  # ML visualizations (6 figures)
 ├── notebooks/
 │   └── nba_analysis.ipynb   # Main notebook (data collection, EDA, hypothesis tests, ML)
 ├── Project_Proposal_Document.pdf
-├── FINAL_REPORT.md
-├── requirements.txt         # Python dependencies
+├── final_report.md
+├── final_report.pdf
+├── requirements.txt
 └── README.md
 ```
 
