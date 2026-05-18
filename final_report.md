@@ -128,6 +128,19 @@ Average BPM slope by position: PG (+0.113), PF (+0.034), SF (+0.021), SG (+0.006
 
 ![Ridge Feature Importance](figures/ml/ridge_feature_importance.png)
 
+#### Model Comparison — Baseline vs Extended Ridge
+
+To directly test whether position adds predictive value beyond skill trends, a baseline model (skill slopes only) was compared against the extended model (skill slopes + position + age).
+
+| Model | Features | R² (5-fold CV) |
+|---|---|---|
+| Baseline | STL_SLOPE, BLK_SLOPE, TS_SLOPE, AST_SLOPE | 0.515 |
+| Extended | + POS_ENCODED, MEAN_AGE | 0.524 |
+
+Adding position and age improved R² by only **+0.009**, confirming that skill profile alone accounts for nearly all predictive power. Position contributes negligible additional information when skill trends are already included.
+
+![Model Comparison](figures/ml/model_comparison.png)
+
 #### Model 2 — K-Means Clustering (k=3)
 **Task:** Group players into aging profile clusters based on their slope features.
 
@@ -162,7 +175,7 @@ The analysis produced several consistent findings across EDA, hypothesis testing
 
 - **Centers maintain their blocking ability into older ages** (r=-0.055, p=0.175 — not significant), suggesting rim protection is a more durable skill than perimeter athleticism.
 
-- **Skill profile predicts aging better than position.** The Ridge Regression model found that TS_SLOPE (shooting efficiency trend) is the dominant predictor of good aging, while position encoding contributed almost nothing. The K-Means clusters also distributed evenly across positions.
+- **Skill profile predicts aging better than position.** The Ridge Regression model found that TS_SLOPE (shooting efficiency trend) is the dominant predictor of good aging, while position encoding contributed almost nothing. The K-Means clusters also distributed evenly across positions. The model comparison confirmed this: adding position to the baseline model improved R² by only +0.009 (from 0.515 to 0.524).
 
 The central finding is that **it is not the position itself that determines aging resilience — it is the underlying skill profile.** Players who improve or maintain their shooting efficiency over time age well regardless of position. PGs tend to age well not because they are guards, but because their skill set (shooting, playmaking) is less dependent on physical decline.
 
