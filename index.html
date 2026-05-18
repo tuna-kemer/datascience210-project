@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBA Position Aging Analysis — DSA210</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --card: #1a2234;
+  --border: #1e3a5f;
+  --accent: #f97316;
+  --accent2: #3b82f6;
+  --accent3: #10b981;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --white: #ffffff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-weight:300; overflow-x:hidden; }
+
+/* SCOREBOARD */
+.scoreboard {
+  background:#000;
+  border-bottom:3px solid var(--accent);
+  padding:0.6rem 2rem;
+  display:flex;
+  gap:3rem;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.score-item {
+  font-family:'DM Mono',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.1em;
+  color:var(--accent);
+  text-transform:uppercase;
+  flex-shrink:0;
+}
+.score-item span { color:var(--white); margin-left:0.5rem; }
+
+/* HERO */
+.hero {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:4rem 6rem;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before {
+  content:'';
+  position:absolute;
+  top:-200px; right:-200px;
+  width:700px; height:700px;
+  background:radial-gradient(circle,rgba(249,115,22,0.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-tag {
+  font-family:'DM Mono',monospace;
+  font-size:0.75rem;
+  letter-spacing:0.2em;
+  color:var(--accent);
+  text-transform:uppercase;
+  margin-bottom:1.5rem;
+  opacity:0;
+  animation:fadeUp 0.6s ease 0.2s forwards;
+}
+.hero-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(4rem,10vw,9rem);
+  line-height:0.9;
+  letter-spacing:0.02em;
+  color:var(--white);
+  margin-bottom:2rem;
+  opacity:0;
+  animation:fadeUp 0.6s ease 0.4s forwards;
+}
+.hero-title span { color:var(--accent); }
+.hero-sub {
+  font-size:1.1rem;
+  color:var(--muted);
+  max-width:600px;
+  line-height:1.7;
+  margin-bottom:3rem;
+  opacity:0;
+  animation:fadeUp 0.6s ease 0.6s forwards;
+}
+.hero-meta {
+  display:flex;
+  gap:2rem;
+  opacity:0;
+  animation:fadeUp 0.6s ease 0.8s forwards;
+  flex-wrap:wrap;
+}
+.meta-item { display:flex; flex-direction:column; gap:0.25rem; }
+.meta-label { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; }
+.meta-value { font-size:0.9rem; color:var(--text); font-weight:500; }
+.hero-scroll {
+  position:absolute; bottom:2rem; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+  opacity:0; animation:fadeUp 0.6s ease 1.2s forwards;
+}
+.hero-scroll span { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; }
+.scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--accent),transparent); animation:scrollPulse 1.5s ease infinite; }
+
+/* SECTIONS */
+section { padding:5rem 6rem; position:relative; }
+.section-tag { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--accent); text-transform:uppercase; margin-bottom:1rem; }
+.section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,5vw,4.5rem); letter-spacing:0.02em; color:var(--white); line-height:1; margin-bottom:3rem; }
+
+/* STATS COUNTER */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:2rem; }
+.stat-card { background:var(--card); padding:2.5rem 2rem; display:flex; flex-direction:column; gap:0.5rem; }
+.stat-number { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; color:var(--accent); line-height:1; }
+.stat-label { font-size:0.85rem; color:var(--muted); line-height:1.4; }
+
+/* POSITION CARDS */
+.pos-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; margin-bottom:3rem; }
+.pos-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:1.5rem 1rem;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  position:relative;
+  overflow:hidden;
+}
+.pos-card:hover, .pos-card.active {
+  border-color:var(--accent);
+  transform:translateY(-4px);
+  background:#1e2d47;
+}
+.pos-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:var(--accent);
+  transform:scaleX(0);
+  transition:transform 0.3s ease;
+}
+.pos-card:hover::before, .pos-card.active::before { transform:scaleX(1); }
+.pos-name { font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:var(--white); line-height:1; }
+.pos-full { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-top:0.25rem; margin-bottom:1rem; }
+.pos-bpm { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; }
+.pos-bpm-label { font-size:0.7rem; color:var(--muted); }
+
+.pos-detail {
+  display:none;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-top:3px solid var(--accent);
+  padding:2rem;
+  margin-top:1rem;
+  animation:fadeUp 0.3s ease forwards;
+}
+.pos-detail.show { display:block; }
+.pos-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.pos-stat { text-align:center; }
+.pos-stat-val { font-family:'Bebas Neue',sans-serif; font-size:2rem; }
+.pos-stat-lbl { font-size:0.75rem; color:var(--muted); }
+
+/* HYPOTHESIS */
+.hypo-section { background:var(--surface); border-top:1px solid var(--border); }
+.hypo-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
+.hypo-card { background:var(--card); border:1px solid var(--border); padding:2rem; transition:border-color 0.3s; }
+.hypo-card:hover { border-color:var(--accent2); }
+.hypo-number { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; margin-bottom:0.5rem; }
+.hypo-title { font-weight:600; color:var(--white); margin-bottom:1rem; font-size:0.95rem; }
+.hypo-result { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
+.badge { font-family:'DM Mono',monospace; font-size:0.65rem; padding:0.2rem 0.6rem; border-radius:2px; text-transform:uppercase; letter-spacing:0.1em; flex-shrink:0; }
+.badge.reject { background:rgba(16,185,129,0.15); color:var(--accent3); border:1px solid rgba(16,185,129,0.3); }
+.badge.fail { background:rgba(249,115,22,0.15); color:var(--accent); border:1px solid rgba(249,115,22,0.3); }
+.hypo-stat { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--muted); }
+.effect-size { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent2); margin-top:0.5rem; }
+
+/* ML */
+.ml-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:3rem; }
+.ml-card { background:var(--card); border:1px solid var(--border); padding:2rem; text-align:center; }
+.ml-model { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; margin-bottom:0.75rem; }
+.ml-metric { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--accent); line-height:1; margin-bottom:0.5rem; }
+.ml-task { font-size:0.85rem; color:var(--muted); margin-bottom:1rem; }
+.ml-finding { font-size:0.8rem; color:var(--text); line-height:1.5; }
+
+/* MODEL COMPARISON */
+.comparison-box {
+  background:var(--card); border:1px solid var(--border); border-left:4px solid var(--accent2);
+  padding:2.5rem; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:2rem; margin-bottom:3rem;
+}
+.comp-model { text-align:center; }
+.comp-label { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; margin-bottom:0.75rem; }
+.comp-score { font-family:'Bebas Neue',sans-serif; font-size:4rem; line-height:1; margin-bottom:0.5rem; }
+.comp-score.baseline { color:var(--accent2); }
+.comp-score.extended { color:var(--accent); }
+.comp-desc { font-size:0.8rem; color:var(--muted); }
+.comp-arrow { display:flex; flex-direction:column; align-items:center; gap:0.5rem; }
+.comp-diff { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--accent3); }
+.comp-verdict { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); text-align:center; letter-spacing:0.1em; }
+
+/* GOOD AGER TEST */
+.test-section { background:var(--surface); border-top:1px solid var(--border); }
+.test-box { background:var(--card); border:1px solid var(--border); border-top:3px solid var(--accent); padding:2.5rem; max-width:700px; }
+.test-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--white); margin-bottom:0.5rem; }
+.test-desc { font-size:0.85rem; color:var(--muted); margin-bottom:2rem; line-height:1.6; }
+.slider-group { margin-bottom:1.5rem; }
+.slider-label { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
+.slider-name { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--text); text-transform:uppercase; letter-spacing:0.1em; }
+.slider-val { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); }
+input[type=range] {
+  width:100%; -webkit-appearance:none; height:4px;
+  background:var(--border); border-radius:2px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px;
+  border-radius:50%; background:var(--accent); cursor:pointer;
+  transition:transform 0.2s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.3); }
+.test-btn {
+  background:var(--accent); color:#000; border:none; padding:0.75rem 2rem;
+  font-family:'DM Mono',monospace; font-size:0.8rem; letter-spacing:0.15em;
+  text-transform:uppercase; cursor:pointer; margin-top:1rem; transition:all 0.2s;
+  font-weight:600;
+}
+.test-btn:hover { background:var(--white); transform:translateY(-1px); }
+.test-result {
+  display:none; margin-top:1.5rem; padding:1.5rem;
+  border:1px solid var(--border); background:var(--bg);
+  animation:fadeUp 0.4s ease forwards;
+}
+.test-result.show { display:block; }
+.result-verdict { font-family:'Bebas Neue',sans-serif; font-size:3rem; line-height:1; margin-bottom:0.5rem; }
+.result-verdict.good { color:var(--accent3); }
+.result-verdict.bad { color:var(--accent); }
+.result-text { font-size:0.85rem; color:var(--muted); line-height:1.6; }
+
+/* CONCLUSION */
+.conclusion-section { border-top:1px solid var(--border); }
+.conclusion-text { font-size:1.6rem; font-weight:300; line-height:1.6; max-width:800px; color:var(--text); }
+.conclusion-text strong { color:var(--white); font-weight:700; }
+.conclusion-text em { color:var(--accent); font-style:normal; font-weight:500; }
+
+/* FOOTER */
+footer { padding:3rem 6rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.footer-left { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); line-height:1.8; }
+.footer-right a { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; border-bottom:1px solid rgba(249,115,22,0.3); padding-bottom:2px; transition:border-color 0.2s; }
+.footer-right a:hover { border-color:var(--accent); }
+.divider { width:60px; height:2px; background:var(--accent); margin-bottom:1.5rem; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes scrollPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes countUp { from{opacity:0} to{opacity:1} }
+
+@media(max-width:768px){
+  .hero,section,footer{padding:3rem 2rem}
+  .hero-title{font-size:4rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .pos-grid{grid-template-columns:repeat(3,1fr)}
+  .hypo-grid,.ml-grid{grid-template-columns:1fr}
+  .comparison-box{grid-template-columns:1fr;text-align:center}
+  footer{flex-direction:column;gap:1rem;text-align:center}
+  .pos-detail-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SCOREBOARD -->
+<div class="scoreboard" id="scoreboard">
+  <div class="score-item">DATASET<span>3,570 PLAYER-SEASONS</span></div>
+  <div class="score-item">SEASONS<span>2010–2024</span></div>
+  <div class="score-item">POSITIONS<span>PG · SG · SF · PF · C</span></div>
+  <div class="score-item">ML MODELS<span>3 (RIDGE · KMEANS · LOGREG)</span></div>
+  <div class="score-item">HYPOTHESIS TESTS<span>4 (T-TEST · PEARSON × 2 · ANOVA)</span></div>
+  <div class="score-item">KEY FINDING<span>SKILL PROFILE &gt; POSITION</span></div>
+  <div class="score-item">DATASET<span>3,570 PLAYER-SEASONS</span></div>
+  <div class="score-item">SEASONS<span>2010–2024</span></div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">DSA 210 · Spring 2025-2026 · Sabancı University</div>
+  <h1 class="hero-title">NBA<br>POSITION<br><span>AGING</span></h1>
+  <p class="hero-sub">Which NBA positions age better — and is it the position itself, or the underlying skill profile that determines aging resilience?</p>
+  <div class="hero-meta">
+    <div class="meta-item"><span class="meta-label">Student</span><span class="meta-value">Tuna Kemer</span></div>
+    <div class="meta-item"><span class="meta-label">Dataset</span><span class="meta-value">3,570 player-seasons</span></div>
+    <div class="meta-item"><span class="meta-label">Period</span><span class="meta-value">2010 – 2024</span></div>
+    <div class="meta-item"><span class="meta-label">Positions</span><span class="meta-value">PG · SG · SF · PF · C</span></div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<section>
+  <div class="section-tag">Dataset</div>
+  <h2 class="section-title">THE DATA</h2>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-number" data-target="3570">0</div><div class="stat-label">Player-season observations</div></div>
+    <div class="stat-card"><div class="stat-number" data-target="26">0</div><div class="stat-label">Features including BPM, TS%, PER, VORP, WS</div></div>
+    <div class="stat-card"><div class="stat-number" data-target="14">0</div><div class="stat-label">Seasons covered (2010–2024)</div></div>
+    <div class="stat-card"><div class="stat-number" data-target="510">0</div><div class="stat-label">Players with 3+ seasons for ML</div></div>
+  </div>
+</section>
+
+<!-- POSITION EXPLORER -->
+<section style="background:var(--surface);border-top:1px solid var(--border);">
+  <div class="section-tag">Interactive</div>
+  <h2 class="section-title">DRAFT A POSITION</h2>
+  <p style="color:var(--muted);font-size:0.9rem;margin-bottom:2rem;">Click a position to explore its aging profile.</p>
+  <div class="pos-grid">
+    <div class="pos-card" onclick="showPos('PG')">
+      <div class="pos-name">PG</div>
+      <div class="pos-full">Point Guard</div>
+      <div class="pos-bpm" style="color:#3b82f6">+0.113</div>
+      <div class="pos-bpm-label">BPM Slope / yr</div>
+    </div>
+    <div class="pos-card" onclick="showPos('SG')">
+      <div class="pos-name">SG</div>
+      <div class="pos-full">Shooting Guard</div>
+      <div class="pos-bpm" style="color:#8b5cf6">+0.006</div>
+      <div class="pos-bpm-label">BPM Slope / yr</div>
+    </div>
+    <div class="pos-card" onclick="showPos('SF')">
+      <div class="pos-name">SF</div>
+      <div class="pos-full">Small Forward</div>
+      <div class="pos-bpm" style="color:#10b981">+0.021</div>
+      <div class="pos-bpm-label">BPM Slope / yr</div>
+    </div>
+    <div class="pos-card" onclick="showPos('PF')">
+      <div class="pos-name">PF</div>
+      <div class="pos-full">Power Forward</div>
+      <div class="pos-bpm" style="color:#f97316">+0.034</div>
+      <div class="pos-bpm-label">BPM Slope / yr</div>
+    </div>
+    <div class="pos-card" onclick="showPos('C')">
+      <div class="pos-name">C</div>
+      <div class="pos-full">Center</div>
+      <div class="pos-bpm" style="color:#ef4444">0.000</div>
+      <div class="pos-bpm-label">BPM Slope / yr</div>
+    </div>
+  </div>
+  <div class="pos-detail" id="pos-detail"></div>
+</section>
+
+<!-- HYPOTHESIS TESTING -->
+<section class="hypo-section">
+  <div class="section-tag">Statistical Tests</div>
+  <h2 class="section-title">HYPOTHESIS TESTING</h2>
+  <div class="hypo-grid">
+    <div class="hypo-card">
+      <div class="hypo-number">Test 01</div>
+      <div class="hypo-title">Do Centers Age Better Than Guards in BPM?</div>
+      <div class="hypo-result"><span class="badge fail">Fail to Reject H₀</span><span class="hypo-stat">t=1.191, p=0.234</span></div>
+      <div class="effect-size">Cohen's d = 0.066 — negligible effect</div>
+    </div>
+    <div class="hypo-card">
+      <div class="hypo-number">Test 02</div>
+      <div class="hypo-title">Does True Shooting % Change With Age?</div>
+      <div class="hypo-result"><span class="badge reject">Reject H₀</span><span class="hypo-stat">r=0.086, p&lt;0.001</span></div>
+      <div class="effect-size">Overall: negligible · PG: r=0.251, small effect</div>
+    </div>
+    <div class="hypo-card">
+      <div class="hypo-number">Test 03</div>
+      <div class="hypo-title">Do Positions Differ in Performance After Age 28?</div>
+      <div class="hypo-result"><span class="badge reject">Reject H₀</span><span class="hypo-stat">F=30.423, p&lt;0.001</span></div>
+      <div class="effect-size">Eta² = 0.031 — small effect</div>
+    </div>
+    <div class="hypo-card">
+      <div class="hypo-number">Test 04</div>
+      <div class="hypo-title">Does Athleticism Decline With Age?</div>
+      <div class="hypo-result"><span class="badge reject">Reject H₀ (PG, PF)</span><span class="hypo-stat">PF: r=−0.212</span></div>
+      <div class="effect-size">PF & PG: small effect · C: negligible (r=−0.055)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ML -->
+<section>
+  <div class="section-tag">Machine Learning</div>
+  <h2 class="section-title">ML MODELS</h2>
+  <div class="ml-grid">
+    <div class="ml-card">
+      <div class="ml-model">Ridge Regression</div>
+      <div class="ml-metric">0.524</div>
+      <div class="ml-task">R² · Predict BPM Slope</div>
+      <div class="ml-finding">TS_SLOPE is the strongest predictor. Position coefficient ≈ −0.002 (near zero).</div>
+    </div>
+    <div class="ml-card">
+      <div class="ml-model">K-Means Clustering</div>
+      <div class="ml-metric">k=3</div>
+      <div class="ml-task">Aging Profile Groups</div>
+      <div class="ml-finding">3 clusters: declining, stable, improving. Distributed similarly across all 5 positions.</div>
+    </div>
+    <div class="ml-card">
+      <div class="ml-model">Logistic Regression</div>
+      <div class="ml-metric">95.7%</div>
+      <div class="ml-task">Good Ager Classification</div>
+      <div class="ml-finding">STL_SLOPE and AST_SLOPE are the strongest signals of good aging.</div>
+    </div>
+  </div>
+  <div class="section-tag">Model Comparison</div>
+  <div class="comparison-box">
+    <div class="comp-model">
+      <div class="comp-label">Baseline Model</div>
+      <div class="comp-score baseline">0.515</div>
+      <div class="comp-desc">Skill slopes only<br>(STL, BLK, TS, AST)</div>
+    </div>
+    <div class="comp-arrow">
+      <div class="comp-diff">+0.009</div>
+      <div class="comp-verdict">Adding position<br>& age</div>
+    </div>
+    <div class="comp-model">
+      <div class="comp-label">Extended Model</div>
+      <div class="comp-score extended">0.524</div>
+      <div class="comp-desc">+ Position + Mean Age</div>
+    </div>
+  </div>
+  <p style="color:var(--muted);font-size:0.9rem;max-width:700px;line-height:1.6;">Adding position improves R² by only <strong style="color:var(--accent3)">+0.009</strong>. <strong style="color:var(--white)">Skill profile, not position, determines aging resilience.</strong></p>
+</section>
+
+<!-- GOOD AGER TEST -->
+<section class="test-section">
+  <div class="section-tag">Interactive · Good Ager Test</div>
+  <h2 class="section-title">ARE YOU A<br><span style="color:var(--accent)">GOOD AGER?</span></h2>
+  <div class="test-box">
+    <div class="test-title">Draft Your Player</div>
+    <div class="test-desc">Adjust the skill trend sliders to simulate a player's career trajectory. Based on our Logistic Regression model findings, we'll predict their aging profile.</div>
+    <div class="slider-group">
+      <div class="slider-label"><span class="slider-name">TS% Trend (Shooting)</span><span class="slider-val" id="ts-val">0.00</span></div>
+      <input type="range" min="-5" max="5" value="0" step="0.1" id="ts-slider" oninput="updateSlider('ts')">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span class="slider-name">STL Trend (Athleticism)</span><span class="slider-val" id="stl-val">0.00</span></div>
+      <input type="range" min="-5" max="5" value="0" step="0.1" id="stl-slider" oninput="updateSlider('stl')">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span class="slider-name">AST Trend (Playmaking)</span><span class="slider-val" id="ast-val">0.00</span></div>
+      <input type="range" min="-5" max="5" value="0" step="0.1" id="ast-slider" oninput="updateSlider('ast')">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span class="slider-name">BLK Trend (Defense)</span><span class="slider-val" id="blk-val">0.00</span></div>
+      <input type="range" min="-5" max="5" value="0" step="0.1" id="blk-slider" oninput="updateSlider('blk')">
+    </div>
+    <button class="test-btn" onclick="runTest()">→ PREDICT AGING PROFILE</button>
+    <div class="test-result" id="test-result">
+      <div class="result-verdict" id="result-verdict"></div>
+      <div class="result-text" id="result-text"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="conclusion-section">
+  <div class="section-tag">Conclusion</div>
+  <h2 class="section-title">THE ANSWER</h2>
+  <div class="divider"></div>
+  <p class="conclusion-text">It is <em>not the position</em> itself that determines aging resilience — it is the <strong>underlying skill profile</strong>. Players who improve or maintain their shooting efficiency (TS%) with age tend to age well <strong>regardless of position</strong>. PGs age well not because they are guards, but because their skill set — shooting and playmaking — is less dependent on physical decline.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">Tuna Kemer · DSA 210 · Sabancı University<br>Introduction to Data Science · Spring 2025-2026</div>
+  <div class="footer-right"><a href="https://github.com/tuna-kemer/datascience210-project" target="_blank">→ GitHub Repository</a></div>
+</footer>
+
+<script>
+// SCOREBOARD SCROLL
+const sb = document.getElementById('scoreboard');
+let pos = 0;
+setInterval(() => {
+  pos += 0.5;
+  if (pos >= sb.scrollWidth / 2) pos = 0;
+  sb.scrollLeft = pos;
+}, 16);
+
+// COUNTER ANIMATION
+function animateCounter(el, target) {
+  let current = 0;
+  const step = target / 60;
+  const timer = setInterval(() => {
+    current += step;
+    if (current >= target) { current = target; clearInterval(timer); }
+    el.textContent = Math.floor(current).toLocaleString();
+  }, 16);
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('[data-target]').forEach(el => {
+        animateCounter(el, parseInt(el.dataset.target));
+      });
+      observer.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+
+const statsSection = document.querySelector('.stats-grid');
+if (statsSection) observer.observe(statsSection);
+
+// POSITION DATA
+const posData = {
+  PG: {
+    color:'#3b82f6',
+    description:'Point Guards are the best agers in the NBA. Their skill profile — shooting and playmaking — is less dependent on physical athleticism, allowing them to sustain high performance into their 30s.',
+    stats:[
+      {val:'+0.113',lbl:'BPM Slope / year',color:'#3b82f6'},
+      {val:'r=0.251',lbl:'TS% improvement with age',color:'#10b981'},
+      {val:'r=−0.104',lbl:'STL decline (small effect)',color:'#f97316'},
+    ],
+    verdict:'⭐ Best Ager'
+  },
+  SG: {
+    color:'#8b5cf6',
+    description:'Shooting Guards show minimal BPM slope, suggesting a relatively stable aging trajectory. Their shooting skills provide some resilience, but they show moderate athleticism decline.',
+    stats:[
+      {val:'+0.006',lbl:'BPM Slope / year',color:'#8b5cf6'},
+      {val:'Moderate',lbl:'Shooting resilience',color:'#10b981'},
+      {val:'Stable',lbl:'Overall aging profile',color:'#64748b'},
+    ],
+    verdict:'📊 Stable Ager'
+  },
+  SF: {
+    color:'#10b981',
+    description:'Small Forwards show the largest BPM improvement after age 28 (+0.55), suggesting they peak later. Their versatile skill profile contributes to sustained performance.',
+    stats:[
+      {val:'+0.021',lbl:'BPM Slope / year',color:'#10b981'},
+      {val:'+0.55',lbl:'BPM gain after age 28',color:'#3b82f6'},
+      {val:'Mixed',lbl:'Skill profile resilience',color:'#f97316'},
+    ],
+    verdict:'📈 Late Bloomer'
+  },
+  PF: {
+    color:'#f97316',
+    description:'Power Forwards are the most vulnerable to aging. Their game relies heavily on athleticism and physicality — skills that erode fastest with age.',
+    stats:[
+      {val:'+0.034',lbl:'BPM Slope / year',color:'#f97316'},
+      {val:'r=−0.212',lbl:'BLK decline (sharpest)',color:'#ef4444'},
+      {val:'+0.30',lbl:'BPM gain after 28 (lowest)',color:'#64748b'},
+    ],
+    verdict:'⚠️ Most At Risk'
+  },
+  C: {
+    color:'#ef4444',
+    description:'Centers maintain the highest shooting efficiency across all ages (~59% TS%). Their rim-finishing skills are durable, and blocking ability shows negligible decline — rim protection ages well.',
+    stats:[
+      {val:'0.000',lbl:'BPM Slope / year',color:'#ef4444'},
+      {val:'~59%',lbl:'TS% (highest of all positions)',color:'#10b981'},
+      {val:'r=−0.055',lbl:'BLK decline (negligible)',color:'#3b82f6'},
+    ],
+    verdict:'🏆 Elite Shooter'
+  }
+};
+
+function showPos(pos) {
+  document.querySelectorAll('.pos-card').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const d = posData[pos];
+  const detail = document.getElementById('pos-detail');
+  detail.innerHTML = `
+    <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem;">${d.description}</p>
+    <div style="display:inline-block;background:rgba(0,0,0,0.3);padding:0.3rem 0.8rem;border:1px solid ${d.color};margin-bottom:1.5rem;">
+      <span style="font-family:'DM Mono',monospace;font-size:0.7rem;color:${d.color};letter-spacing:0.1em;">${d.verdict}</span>
+    </div>
+    <div class="pos-detail-grid">
+      ${d.stats.map(s=>`
+        <div class="pos-stat">
+          <div class="pos-stat-val" style="color:${s.color}">${s.val}</div>
+          <div class="pos-stat-lbl">${s.lbl}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  detail.classList.add('show');
+}
+
+// SLIDER
+function updateSlider(id) {
+  const val = parseFloat(document.getElementById(id+'-slider').value);
+  document.getElementById(id+'-val').textContent = (val >= 0 ? '+' : '') + val.toFixed(2);
+}
+
+// GOOD AGER TEST
+function runTest() {
+  const ts = parseFloat(document.getElementById('ts-slider').value);
+  const stl = parseFloat(document.getElementById('stl-slider').value);
+  const ast = parseFloat(document.getElementById('ast-slider').value);
+  const blk = parseFloat(document.getElementById('blk-slider').value);
+
+  // Based on our model: TS_SLOPE (+0.363), AST_SLOPE (+0.125), STL_SLOPE (+0.075), BLK_SLOPE (+0.035)
+  const score = (ts * 0.363) + (ast * 0.125) + (stl * 0.075) + (blk * 0.035);
+  const isGood = score > 0;
+
+  const resultEl = document.getElementById('test-result');
+  const verdictEl = document.getElementById('result-verdict');
+  const textEl = document.getElementById('result-text');
+
+  verdictEl.className = 'result-verdict ' + (isGood ? 'good' : 'bad');
+  verdictEl.textContent = isGood ? '✓ GOOD AGER' : '✗ NOT A GOOD AGER';
+
+  const dominant = ts > stl && ts > ast ? 'shooting efficiency (TS%)' : ast > stl ? 'playmaking (AST)' : 'athleticism (STL)';
+
+  textEl.innerHTML = isGood
+    ? `This player profile scores <strong style="color:var(--accent3)">${score.toFixed(3)}</strong> on our aging index. The dominant factor is <strong>${dominant}</strong>. Based on our Ridge Regression model, players with improving shooting and playmaking trends age well regardless of position.`
+    : `This player profile scores <strong style="color:var(--accent)">${score.toFixed(3)}</strong> on our aging index. Declining skills — especially TS% and AST — are strong signals of poor aging. This aligns with our finding that skill profile determines aging resilience more than position.`;
+
+  resultEl.classList.add('show');
+}
+</script>
+</body>
+</html>
