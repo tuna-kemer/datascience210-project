@@ -1,10 +1,12 @@
 # NBA Position Aging Analysis
 
-**DSA 210 — Introduction to Data Science | Spring 2025-2026**
+**DSA 210 — Introduction to Data Science | Spring 2025-2026**  
+**Sabancı University**
 
 ---
 
 ## 1. Research Question
+
 Which NBA positions age better, and are these differences related to how key skills (athleticism, shooting, playmaking) decline over time?
 
 ---
@@ -35,6 +37,13 @@ Which NBA positions age better, and are these differences related to how key ski
 | Correlation Heatmap | PER, BPM, VORP, WS are highly correlated (0.80-0.95) |
 | TS% and BPM Trends (Smoothed) | Centers maintain highest TS% across all ages |
 | Skill Group Analysis | Athleticism declines, shooting improves, playmaking stable with age |
+
+![Age Distribution](figures/eda/age_distribution.png)
+![BPM by Age and Position](figures/eda/bpm_by_age_position.png)
+![Stats by Position](figures/eda/stats_by_position.png)
+![Correlation Heatmap](figures/eda/correlation_heatmap.png)
+![Trend Age Performance](figures/eda/trend_age_performance.png)
+![Skill Groups by Age](figures/eda/skill_groups_by_age.png)
 
 ---
 
@@ -116,6 +125,14 @@ Career slope features were computed for each player with 3+ seasons:
 - Result: Accuracy = 0.957 (5-fold CV), 0.941 (test)
 - Key finding: STL_SLOPE and AST_SLOPE are the strongest signals of good aging
 
+### 5.3 Visualizations
+
+![Ridge Feature Importance](figures/ml/ridge_feature_importance.png)
+![K-Means Clusters](figures/ml/kmeans_clusters.png)
+![K-Means Elbow](figures/ml/kmeans_elbow.png)
+![Confusion Matrix](figures/ml/confusion_matrix.png)
+![ML Summary](figures/ml/ml_summary.png)
+
 ---
 
 ## 6. Key Findings
@@ -142,11 +159,36 @@ datascience210-project/
 ├── notebooks/
 │   └── nba_analysis.ipynb   # Main notebook (data collection, EDA, hypothesis tests, ML)
 ├── Project_Proposal_Document.pdf
+├── FINAL_REPORT.md
 ├── requirements.txt         # Python dependencies
 └── README.md
 ```
 
-## 8. Dependencies
+---
+
+## 8. How to Reproduce
+
+1. Clone the repository:
+```bash
+git clone https://github.com/tuna-kemer/datascience210-project.git
+cd datascience210-project
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Upload `nba_final.csv` from the `data/` folder to your Colab session, then open and run:
+```
+notebooks/nba_analysis.ipynb
+```
+
+All figures will be saved to `figures/eda/` and `figures/ml/` automatically.
+
+---
+
+## 9. Dependencies
 
 ```
 nba_api
@@ -157,6 +199,18 @@ scipy
 scikit-learn
 ```
 
+---
+
+## 10. AI Usage Disclosure
+
+AI assistance (Claude by Anthropic) was used in this project in accordance with Sabancı University DSA210 course guidelines. Specifically, Claude was used for:
+- Debugging Python code and resolving library errors
+- Suggesting and structuring ML model implementations
+- Reviewing and improving README and report formatting
+
+All analysis decisions, interpretations, and conclusions are the author's own work.
+
+---
+
 ## Notes
 This project was completed as part of DSA210 coursework at Sabancı University.
-AI assistance (Claude) was used in accordance with course guidelines for coding support and debugging.
