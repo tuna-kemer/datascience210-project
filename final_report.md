@@ -72,8 +72,8 @@ Four formal statistical tests were conducted to validate the EDA findings.
 
 - H₀: No difference in BPM between Centers and Point Guards
 - H₁: Centers maintain higher BPM than Guards with age
-- Result: T=1.191, p=0.234
-- **Conclusion:** Null hypothesis cannot be rejected. No statistically significant BPM difference between Centers (mean=0.726) and Guards (mean=0.548).
+- Result: T=1.191, p=0.234, Cohen's d=0.066 (negligible effect)
+- **Conclusion:** Null hypothesis cannot be rejected. No statistically significant BPM difference between Centers (mean=0.726) and Guards (mean=0.548). The negligible effect size confirms this difference is not practically meaningful.
 
 ---
 
@@ -81,8 +81,8 @@ Four formal statistical tests were conducted to validate the EDA findings.
 
 - H₀: No correlation between age and TS%
 - H₁: TS% changes significantly with age
-- Result: r=0.086, p<0.001
-- **Conclusion:** Null hypothesis rejected. TS% increases significantly with age overall. PGs show the strongest improvement (r=0.251), while Centers show no significant change (r=-0.049, p=0.225).
+- Result: r=0.086, p<0.001 (negligible effect overall; PG: r=0.251, small effect)
+- **Conclusion:** Null hypothesis rejected. TS% increases significantly with age overall, though the effect is small. PGs show the strongest improvement (r=0.251, small effect), while Centers show no significant change (r=-0.049, p=0.225). Note: significance is partly driven by the large sample size (3,570 observations).
 
 ---
 
@@ -90,8 +90,8 @@ Four formal statistical tests were conducted to validate the EDA findings.
 
 - H₀: No BPM difference across positions for players over 28
 - H₁: Some positions maintain performance better after age 28
-- Result: F=30.423, p<0.001
-- **Conclusion:** Null hypothesis rejected. BPM differs significantly across positions after age 28. SF shows the largest post-28 gain (+0.55 BPM), PF the smallest (+0.30).
+- Result: F=30.423, p<0.001, Eta²=0.031 (small effect)
+- **Conclusion:** Null hypothesis rejected. BPM differs significantly across positions after age 28, though the effect size is small (Eta²=0.031). SF shows the largest post-28 gain (+0.55 BPM), PF the smallest (+0.30). The large F-statistic reflects the sample size rather than a large practical difference.
 
 ---
 
@@ -99,8 +99,8 @@ Four formal statistical tests were conducted to validate the EDA findings.
 
 - H₀: No relationship between age and athleticism metrics
 - H₁: Athleticism declines significantly with age
-- Result: PG steals r=-0.104 (p<0.01), PF blocks r=-0.212 (p<0.001)
-- **Conclusion:** Null hypothesis rejected for PG and PF. PF athleticism declines most sharply. Centers maintain blocking ability with age (r=-0.055, p=0.175).
+- Result: PG steals r=-0.104 (p<0.01, small effect), PF blocks r=-0.212 (p<0.001, small effect), C blocks r=-0.055 (p=0.175, negligible)
+- **Conclusion:** Null hypothesis rejected for PG and PF. PF athleticism declines most sharply (small effect). Centers maintain blocking ability with age, with a negligible and non-significant correlation.
 
 ---
 
